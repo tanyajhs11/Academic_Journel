@@ -15,10 +15,22 @@ import Home from "./Components/Home";
 
 const App = () => {
   const [toRender, setToRender] = useState("Home");
+  const [numberOfFields, setNumberOfFields] = useState({
+    Journal: [1],
+    Bookchapter: [1, 1],
+    Conference: [1],
+    ExpertTalks: [1],
+    InvitedTalks: [1],
+    WorkshopSeminar: [1],
+    FacultyDevProg: [1],
+  });
+
   const myMap = {
-    Home: <Home/>,
-    Journal: <Journal />,
-    Bookchapter: <Bookchapter />,
+    Home: <Home />,
+    Journal: <Journal numberOfFields={numberOfFields} setNumberOfFields={setNumberOfFields} />,
+    Bookchapter: (
+      <Bookchapter numberOfFields={numberOfFields} setNumberOfFields={setNumberOfFields} />
+    ),
     Conference: <Conference />,
     ExpertTalks: <ExpertTalks />,
     InvitedTalks: <InvitedTalks />,
