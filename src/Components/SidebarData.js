@@ -1,5 +1,6 @@
 import React from "react";
 import HomeIcon from "@mui/icons-material/Home";
+import ImportContactsIcon from '@mui/icons-material/ImportContacts';
 import BookIcon from "@mui/icons-material/Book";
 import VideoCallIcon from "@mui/icons-material/VideoCall";
 import PeopleIcon from "@mui/icons-material/People";
@@ -8,10 +9,16 @@ import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
 import AndroidIcon from "@mui/icons-material/Android";
 import FeedIcon from "@mui/icons-material/Feed";
 
+
 export const SidebarData = [
   {
-    title: "Journal",
+    title: "Home",
     icon: <HomeIcon />,
+    link: "/Home",
+  },
+  {
+    title: "Journal",
+    icon: <ImportContactsIcon />,
     link: "/Journal",
   },
   {
@@ -38,16 +45,6 @@ export const SidebarData = [
     title: "WorkshopSeminar",
     icon: <WorkspacePremiumIcon />,
     link: "/WorkspacePremium",
-  },
-  {
-    title: "FacultyDevProg",
-    icon: <AndroidIcon />,
-    link: "/Android",
-  },
-  {
-    title: "AdministrationDevProg",
-    icon: <AndroidIcon />,
-    link: "/Android",
   },
   {
     title: "PaperReviews",

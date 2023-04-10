@@ -11,10 +11,12 @@ import InvitedTalks from "./Components/InvitedTalks";
 import ExpertTalks from "./Components/ExpertTalks";
 import PaperReviews from "./Components/PaperReviews";
 import WorkshopSeminar from "./Components/WorkshopSeminar";
+import Home from "./Components/Home";
 
 const App = () => {
-  const [toRender, setToRender] = useState("Journal");
+  const [toRender, setToRender] = useState("Home");
   const myMap = {
+    Home: <Home/>,
     Journal: <Journal />,
     Bookchapter: <Bookchapter />,
     Conference: <Conference />,
