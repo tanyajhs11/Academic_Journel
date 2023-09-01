@@ -1,7 +1,39 @@
 import React from 'react'
 import '../App.css'
+import { useState } from "react";
 
-function PaperReviews() {
+function PaperReviews({ numberOfFields, setNumberOfFields }) {
+  const currKey = "PaperReviews";
+  const [required, setRequired] = useState({
+    "First Name*": "",
+    "Department Name*":"",
+    "Name of Journal": "",
+    "Name of Conference*": "",
+    
+  });
+
+  const handleFirstNameChanged = (e) => {
+    setRequired({ ...required, "First Name*": e.target.value });
+  };
+  const handleDepartmentChanged = (e) => {
+    setRequired({ ...required, "Department Name*": e.target.value });
+  };
+  const handleJournalChanged = (e) => {
+    setRequired({ ...required, "Name of Journal": e.target.value });
+  };
+  const handleConferenceChanged = (e) => {
+    setRequired({ ...required, "Name of Conference*": e.target.value });
+  };
+  const handleSubmitButtonClicked = () => {
+    let flag = false;
+    for (const key in required) {
+      if (required[key] === "") {
+        flag = true;
+        break;
+      }
+    }
+    flag ? alert("Please fill all the required fields") : alert("Updated Successfully");
+  };
   return  (
     <div className='containerbox1'>
       <div className='title'>
@@ -11,9 +43,17 @@ function PaperReviews() {
       <div className='nametitle'> 
       <div className='inputfield'>
       <div className='inputfieldtext'>
-      <label for="fname">First Name</label>
+      <label for="fname">First Name*</label>
       </div>
-      <input type="text" id="fname" name="firstname" placeholder="Your first name"/>
+      <input type="text" id="fname" name="firstname" placeholder="Your first name"
+      onChange={(e) => handleFirstNameChanged(e)}/>
+      </div>
+
+      <div className='inputfield'>
+      <div className='inputfieldtext'>
+      <label for="fname">Middle Name</label>
+      </div>
+      <input type="text" id="fname" name="firstname" placeholder="Your Middle name"/>
       </div>
 
       <div className='inputfield'>
@@ -28,16 +68,18 @@ function PaperReviews() {
       <div className='nametitle'> 
       <div className='inputfield'>
       <div className='inputfieldtext'>
-      <label for="fname">Department Name</label>
+      <label for="fname">Department Name*</label>
       </div>
-      <input type="text" id="fname" name="lastname" placeholder="name of department"/>
+      <input type="text" id="fname" name="lastname" placeholder="name of department"
+      onChange={(e) => handleDepartmentChanged(e)}/>
       </div>
 
       <div className='inputfield'>
       <div className='inputfieldtext'>
-      <label for="fname">Name of Journal</label>
+      <label for="fname">Name of Journal*</label>
       </div>
-      <input type="text" id="fname" name="lastname" placeholder="Journal Name"/>
+      <input type="text" id="fname" name="lastname" placeholder="Journal Name"
+      onChange={(e) => handleJournalChanged(e)}/>
       </div>
       </div>
 
@@ -47,9 +89,10 @@ function PaperReviews() {
       <div className='nametitle'> 
       <div className='inputfield'>
       <div className='inputfieldtext'>
-      <label for="fname">Name of Conference</label>
+      <label for="fname">Name of Conference*</label>
       </div>
-      <input type="text" id="fname" name="lastname" placeholder="Conference Name"/>
+      <input type="text" id="fname" name="lastname" placeholder="Conference Name"
+      onChange={(e) => handleConferenceChanged(e)}/>
       </div>
 
       <div className='inputfield'>
@@ -170,12 +213,19 @@ function PaperReviews() {
 
      
   
-      <div className='buttoncontainer'> 
-    <button class="button-43" role="button" style={{marginLeft:"38.5%"}}>Submit</button>
-    <button class="button-43" role="button" style={{marginRight:"30%"}}>Export</button>
-
-    </div>
-
+      <div className="buttoncontainer">
+        <button
+          class="button-43"
+          role="button"
+          style={{ marginLeft: "41.5%" }}
+          onClick={handleSubmitButtonClicked}
+        >
+          Submit
+        </button>
+        <button class="button-43" role="button" style={{ marginRight: "32%" }}>
+          Export
+        </button>
+      </div>
     </div>
   )
 }

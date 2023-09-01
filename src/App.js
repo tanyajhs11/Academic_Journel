@@ -31,13 +31,13 @@ const App = () => {
     Bookchapter: (
       <Bookchapter numberOfFields={numberOfFields} setNumberOfFields={setNumberOfFields} />
     ),
-    Conference: <Conference />,
-    ExpertTalks: <ExpertTalks />,
-    InvitedTalks: <InvitedTalks />,
-    WorkshopSeminar: <WorkshopSeminar />,
-    FacultyDevProg: <FacultyDevProg />,
-    AdministrationDevProg: <AdministrationDevProg />,
-    PaperReviews: <PaperReviews />,
+    Conference: <Conference numberOfFields={numberOfFields} setNumberOfFields={setNumberOfFields} />,
+    ExpertTalks: <ExpertTalks numberOfFields={numberOfFields} setNumberOfFields={setNumberOfFields}/>,
+    InvitedTalks: <InvitedTalks numberOfFields={numberOfFields} setNumberOfFields={setNumberOfFields} />,
+    WorkshopSeminar: <WorkshopSeminar numberOfFields={numberOfFields} setNumberOfFields={setNumberOfFields}/>,
+    FacultyDevProg: <FacultyDevProg numberOfFields={numberOfFields} setNumberOfFields={setNumberOfFields}/>,
+    AdministrationDevProg: <AdministrationDevProg numberOfFields={numberOfFields} setNumberOfFields={setNumberOfFields}/>,
+    PaperReviews: <PaperReviews numberOfFields={numberOfFields} setNumberOfFields={setNumberOfFields}/>,
   };
   return (
     <div className="App">

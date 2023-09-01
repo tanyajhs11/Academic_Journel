@@ -7,7 +7,7 @@ function Journal({ numberOfFields, setNumberOfFields }) {
     "First Name": "",
     "Name Of Journal": "",
     "Title Of Paper": "",
-    Publisher: "",
+    Publisher : "",
   });
 
   const handleAddMoreClicked = (index) => {
@@ -47,7 +47,7 @@ function Journal({ numberOfFields, setNumberOfFields }) {
         <div className="nametitle">
           <div className="inputfield">
             <div className="inputfieldtext">
-              <label for="fname">First Name</label>
+              <label for="fname">First Name*</label>
             </div>
             <input
               type="text"
@@ -58,6 +58,14 @@ function Journal({ numberOfFields, setNumberOfFields }) {
             />
           </div>
 
+          <div className="inputfield">
+            <div className="inputfieldtext">
+              <label for="fname">Middle Name</label>
+            </div>
+            <input type="text" id="fname" name="lastname" placeholder="Your Middle name" />
+          </div>
+
+        
           <div className="inputfield">
             <div className="inputfieldtext">
               <label for="fname">Last Name</label>
@@ -94,18 +102,26 @@ function Journal({ numberOfFields, setNumberOfFields }) {
       <div className="title">Please Enter The Following Details :-</div>
 
       <div>
-        <button onClick={() => handleAddMoreClicked(0)}>Add more</button>
+        
+      </div>
+     
+      <div>
+        <button
+          style={{position:"relative",left:"1120px",top:"22px"}} onClick={() => handleAddMoreClicked(0)}>Add More</button>
       </div>
 
-      {renderFields(0)}
       <div>
-        <button onClick={() => handleRemoveClicked(0)}>Remove</button>
+        <button 
+          style={{ marginLeft: "85%",position:"relative",left:"100px"}}onClick={() => handleRemoveClicked(0)}>Remove</button>
       </div>
+      {renderFields(0)}
+
+     
 
       <div className="nametitle">
         <div className="inputfield">
           <div className="inputfieldtext">
-            <label for="fname">Title Of Paper</label>
+            <label for="fname">Title Of Paper*</label>
           </div>
           <input
             type="text"
@@ -118,7 +134,7 @@ function Journal({ numberOfFields, setNumberOfFields }) {
 
         <div className="inputfield">
           <div className="inputfieldtext">
-            <label for="fname">Name Of Journal</label>
+            <label for="fname">Name of Journal*</label>
           </div>
           <input
             type="text"
@@ -126,21 +142,6 @@ function Journal({ numberOfFields, setNumberOfFields }) {
             name="lastname"
             placeholder="Journal Name"
             onChange={(e) => handleJournalNameChanged(e)}
-          />
-        </div>
-      </div>
-
-      <div className="nametitle">
-        <div className="inputfield">
-          <div className="inputfieldtext">
-            <label for="fname">Publisher</label>
-          </div>
-          <input
-            type="text"
-            id="fname"
-            name="lastname"
-            placeholder="Publisher"
-            onChange={(e) => handlePublisherChanged(e)}
           />
         </div>
 
@@ -151,6 +152,40 @@ function Journal({ numberOfFields, setNumberOfFields }) {
           <input type="text" id="fname" name="lastname" placeholder="Doi" />
         </div>
       </div>
+
+    
+
+  
+
+      <div className="nametitle">
+          <div className="inputfield">
+            <div className="inputfieldtext">
+              <label for="fname">Publisher : First Name*</label>
+            </div>
+            <input
+              type="text"
+              id="fname"
+              name="firstname"
+              placeholder="Your first name"
+              onChange={(e) => handlePublisherChanged(e)}
+            />
+          </div>
+
+          <div className="inputfield">
+            <div className="inputfieldtext">
+              <label for="fname">Publisher : Middle Name</label>
+            </div>
+            <input type="text" id="fname" name="lastname" placeholder="Your Middle name" />
+          </div>
+
+        
+          <div className="inputfield">
+            <div className="inputfieldtext">
+              <label for="fname">Publisher : Last Name</label>
+            </div>
+            <input type="text" id="fname" name="lastname" placeholder="Your last name" />
+          </div>
+        </div>
 
       <p
         style={{
@@ -179,16 +214,6 @@ function Journal({ numberOfFields, setNumberOfFields }) {
           </div>
           <input type="number" id="page" name="lastname" placeholder="To" />
         </div>
-      </div>
-
-      <div className="nametitle">
-        <div className="inputfield">
-          <div className="inputfieldtext">
-            <label for="fname">Volume Number</label>
-          </div>
-          <input type="text" id="fname" name="lastname" placeholder="Volume no." />
-        </div>
-
         <div className="inputfield" style={{ marginLeft: "7%", width: 90 }}>
           <div className="inputfieldtext" style={{ marginLeft: "-95%", marginBottom: "12%" }}>
             <label for="fname">Year</label>
@@ -200,16 +225,41 @@ function Journal({ numberOfFields, setNumberOfFields }) {
         </div>
       </div>
 
+      <div className="nametitle">
+
+      <div className="inputfield">
+          <div className="inputfieldtext">
+            <label for="fname">Number Of Authors</label>
+          </div>
+          <input type="number" id="page" name="lastname" placeholder="Number" />
+        </div>
+
+        <div className="inputfield">
+          <div className="inputfieldtext">
+            <label for="fname">Volume : </label>
+          </div>
+          <input type="text" id="fname" name="lastname" placeholder="Volume no." />
+        </div>
+        <div className="inputfield">
+          <div className="inputfieldtext">
+            <label for="fname">Volume Number : </label>
+          </div>
+          <input type="number" id="fname" name="lastname" placeholder="Number." />
+        </div>
+
+
+      </div>
+
       <div className="buttoncontainer">
         <button
           class="button-43"
           role="button"
-          style={{ marginLeft: "38.5%" }}
+          style={{ marginLeft: "41.5%" }}
           onClick={handleSubmitButtonClicked}
         >
           Submit
         </button>
-        <button class="button-43" role="button" style={{ marginRight: "30%" }}>
+        <button class="button-43" role="button" style={{ marginRight: "32%" }}>
           Export
         </button>
       </div>
