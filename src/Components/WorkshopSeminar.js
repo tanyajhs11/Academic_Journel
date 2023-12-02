@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { addDoc, collection } from 'firebase/firestore';
-import { db } from '../firebaseConfig';
+import React, { useState, useEffect } from 'react';
+import { db, collection, addDoc, getDocs } from '../firebaseConfig';
+import { PDFDocument } from 'pdf-lib';
+
 
 function WorkshopSeminar({ numberOfFields, setNumberOfFields }) {
   const currKey = "WorkshopSeminar";
@@ -12,6 +13,64 @@ function WorkshopSeminar({ numberOfFields, setNumberOfFields }) {
     "Name of Programme*": "",
     "Place : City*": "",
   });
+
+  const [firestoreData, setFirestoreData] = useState([]); // State to store fetched data
+
+  useEffect(() => {
+    // Fetch Firestore data when the component mounts
+    fetchFirestoreData();
+  }, []);
+
+  const downloadAsPDF = async () => {
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage();
+    const { width, height } = page.getSize();
+  
+    const text = JSON.stringify(firestoreData, null, 2);
+    const font = await pdfDoc.embedFont(PDFDocument.Font.Helvetica);
+  
+    page.drawText(text, { x: 50, y: height - 100, font });
+  
+    const pdfBytes = await pdfDoc.save();
+    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+  
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'data.pdf';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+  
+  const downloadAsText = () => {
+    const textData = JSON.stringify(firestoreData, null, 2); // Convert data to JSON string
+    const blob = new Blob([textData], { type: 'text/plain' }); // Create a Blob
+    const link = document.createElement('a'); // Create a link element
+    link.href = URL.createObjectURL(blob); // Set the link's href to the Blob's URL
+    link.download = 'data.txt'; // Set the file name
+    document.body.appendChild(link); // Append the link to the body
+    link.click(); // Simulate a click to trigger the download
+    document.body.removeChild(link); // Remove the link from the body
+  };
+  
+
+  const fetchFirestoreData = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, 'WorkshopSeminar'));
+      const data = querySnapshot.docs.map(doc => doc.data());
+      setFirestoreData(data);
+      console.log('Fetched Firestore data:', data);
+    } catch (error) {
+      console.error('Error fetching Firestore data:', error);
+    }
+  };
+
+  const handleExportPDF = () => {
+    // Fetch Firestore data before exporting to PDF
+    fetchFirestoreData(); // Fetch Firestore data before exporting to PDF
+  downloadAsText(); // Download data as text
+    console.log('Exporting PDF with data:', firestoreData);
+  };
 
   const handleFirstNameChanged = (e) => {
     setRequired({ ...required, "Coordinator's First Name*": e.target.value });
@@ -276,7 +335,12 @@ function WorkshopSeminar({ numberOfFields, setNumberOfFields }) {
         >
           Submit
         </button>
-        <button className="button-43" role="button" style={{ marginRight: "32%" }}>
+           <button
+          className="button-43"
+          role="button"
+          style={{ marginRight: "32%" }}
+          onClick={handleExportPDF}
+        >
           Export
         </button>
       </div>

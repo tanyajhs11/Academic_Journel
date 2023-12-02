@@ -1,7 +1,6 @@
-import React, { useState , useEffect} from "react";
-import { db, collection, addDoc , getDocs } from '../firebaseConfig'; // Adjust the path accordingly
-import generatePDF from 'react-to-pdf';
-
+import React, { useState, useEffect } from 'react';
+import { db, collection, addDoc, getDocs } from '../firebaseConfig';
+import { PDFDocument } from 'pdf-lib';
 
 function Journal({ numberOfFields, setNumberOfFields }) {
   const currKey = "Journal";
@@ -11,33 +10,66 @@ function Journal({ numberOfFields, setNumberOfFields }) {
     "Title Of Paper": "",
     Publisher: "",
   });
-  const [journalData, setJournalData] = useState([]);
-  const targetRef = React.useRef();
+ 
+  const [firestoreData, setFirestoreData] = useState([]); // State to store fetched data
 
-  const fetchDataFromFirestore = async () => {
+  useEffect(() => {
+    // Fetch Firestore data when the component mounts
+    fetchFirestoreData();
+  }, []);
+
+  const downloadAsPDF = async () => {
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage();
+    const { width, height } = page.getSize();
+  
+    const text = JSON.stringify(firestoreData, null, 2);
+    const font = await pdfDoc.embedFont(PDFDocument.Font.Helvetica);
+  
+    page.drawText(text, { x: 50, y: height - 100, font });
+  
+    const pdfBytes = await pdfDoc.save();
+    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+  
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'data.pdf';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+  
+  const downloadAsText = () => {
+    const textData = JSON.stringify(firestoreData, null, 2); // Convert data to JSON string
+    const blob = new Blob([textData], { type: 'text/plain' }); // Create a Blob
+    const link = document.createElement('a'); // Create a link element
+    link.href = URL.createObjectURL(blob); // Set the link's href to the Blob's URL
+    link.download = 'data.txt'; // Set the file name
+    document.body.appendChild(link); // Append the link to the body
+    link.click(); // Simulate a click to trigger the download
+    document.body.removeChild(link); // Remove the link from the body
+  };
+  
+
+  const fetchFirestoreData = async () => {
     try {
       const querySnapshot = await getDocs(collection(db, 'Journal'));
-      const data = [];
-      querySnapshot.forEach((doc) => {
-        data.push(doc.data());
-      });
-      console.log('Fetched data from Firestore:', data);
-      setJournalData(data);
+      const data = querySnapshot.docs.map(doc => doc.data());
+      setFirestoreData(data);
+      console.log('Fetched Firestore data:', data);
     } catch (error) {
-      console.error('Error fetching data from Firestore:', error);
+      console.error('Error fetching Firestore data:', error);
     }
   };
 
-
-const handleExportButtonClicked = async () => {
-  await fetchDataFromFirestore();
-
-  const options = {
-    filename: 'journal_data.pdf',
+  const handleExportPDF = () => {
+    // Fetch Firestore data before exporting to PDF
+    fetchFirestoreData(); // Fetch Firestore data before exporting to PDF
+  downloadAsText(); // Download data as text
+    console.log('Exporting PDF with data:', firestoreData);
   };
 
-  generatePDF(targetRef, {filename: 'page.pdf'});
-};
+
 
   const handleAddMoreClicked = (index) => {
     const newNumberOfFields = [...numberOfFields[currKey]];
@@ -148,18 +180,7 @@ const handleExportButtonClicked = async () => {
     <div className="containerbox1">
       <div className="title">Please Enter The Following Details :-</div>
 
-      <div ref={targetRef} style={{display:"none"}} id="pdf-content"> {/* This is the target element for PDF content */}
-        {/* Your data rendering logic here */}
-        {journalData.map((entry, index) => (
-          <div key={index}>
-            <p>{`First Name: ${entry["First Name"]}`}</p>
-            <p>{`Name Of Journal: ${entry["Name Of Journal"]}`}</p>
-            <p>{`Title Of Paper: ${entry["Title Of Paper"]}`}</p>
-            <p>{`Publisher: ${entry["Publisher"]}`}</p>
-          </div>
-        ))}
-      </div>
-
+     
       <div>
         <button style={{ position: "relative", left: "1120px", top: "22px" }} onClick={() => handleAddMoreClicked(0)}>Add More</button>
       </div>
@@ -167,24 +188,8 @@ const handleExportButtonClicked = async () => {
       <div>
         <button style={{ marginLeft: "85%", position: "relative", left: "100px" }} onClick={() => handleRemoveClicked(0)}>Remove</button>
       </div>
-      {journalData.map((entry, index) => (
-        <div style={{ display: 'none' }}  key={index} >
-          <p>{`First Name: ${entry["firstName"]}`}</p>
-          <p>{`Name Of Journal: ${entry["nameOfJournal"]}`}</p>
-          <p>{`Title Of Paper: ${entry["titleOfPaper"]}`}</p>
-          <p>{`Publisher: ${entry["publisher"]}`}</p>
-        </div>
-      ))}
-      <div id="pdf-content" style={{ display: 'none' }}>
-        {journalData.map((entry, index) => (
-          <div key={index}>
-            <p>{`First Name: ${entry["firstName"]}`}</p>
-            <p>{`Name Of Journal: ${entry["nameOfJournal"]}`}</p>
-            <p>{`Title Of Paper: ${entry["titleOfPaper"]}`}</p>
-            <p>{`Publisher: ${entry["publisher"]}`}</p>
-          </div>
-        ))}
-      </div>
+     
+     
 
       <div className="nametitle">
         <div className="inputfield">
@@ -319,7 +324,12 @@ const handleExportButtonClicked = async () => {
         >
           Submit
         </button>
-        <button className="button-43" role="button" style={{ marginRight: "32%" }}  onClick={handleExportButtonClicked}>
+        <button
+          className="button-43"
+          role="button"
+          style={{ marginRight: "32%" }}
+          onClick={handleExportPDF}
+        >
           Export
         </button>
       </div>
