@@ -1,20 +1,26 @@
-import "./App.css";
-import Sidebar from "./Components/Sidebar";
-import React, { useState } from "react";
-import { BrowserRouter, Link, Route, Routes } from "react-router-dom";
-import Bookchapter from "./Components/Bookchapter";
-import Journal from "./Components/Journal";
-import Conference from "./Components/Conference";
-import AdministrationDevProg from "./Components/AministrationDevProg";
-import FacultyDevProg from "./Components/FacultyDevProg";
-import InvitedTalks from "./Components/InvitedTalks";
-import ExpertTalks from "./Components/ExpertTalks";
-import PaperReviews from "./Components/PaperReviews";
-import WorkshopSeminar from "./Components/WorkshopSeminar";
-import Home from "./Components/Home";
+// App.js
+
+import './App.css';
+import Sidebar from './Components/Sidebar';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Bookchapter from './Components/Bookchapter';
+import Journal from './Components/Journal';
+import Conference from './Components/Conference';
+import AdministrationDevProg from './Components/AministrationDevProg';
+import FacultyDevProg from './Components/FacultyDevProg';
+import InvitedTalks from './Components/InvitedTalks';
+import ExpertTalks from './Components/ExpertTalks';
+import PaperReviews from './Components/PaperReviews';
+import WorkshopSeminar from './Components/WorkshopSeminar';
+import Home from './Components/Home';
+import Login from './Components/Login';
+import SignUp from './Components/SignUp'; 
+import { onAuthStateChanged } from 'firebase/auth';
+import { app, analytics, auth } from './firebaseConfig'; // Update the import statement
 
 const App = () => {
-  const [toRender, setToRender] = useState("Home");
+  const [toRender, setToRender] = useState('Home');
   const [numberOfFields, setNumberOfFields] = useState({
     Journal: [1],
     Bookchapter: [1, 1],
@@ -39,13 +45,40 @@ const App = () => {
     AdministrationDevProg: <AdministrationDevProg numberOfFields={numberOfFields} setNumberOfFields={setNumberOfFields}/>,
     PaperReviews: <PaperReviews numberOfFields={numberOfFields} setNumberOfFields={setNumberOfFields}/>,
   };
+
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+    });
+
+    // Clean up subscription on unmount
+    return () => unsubscribe();
+  }, []);
+
   return (
-    <div className="App">
-      <div className="container">
-        <Sidebar toRender={toRender} setToRender={setToRender} />
-        {myMap[toRender]}
-      </div>
-    </div>
+    <Router>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            user ? (
+              <div className="App">
+                <div className="container">
+                  <Sidebar toRender={toRender} setToRender={setToRender} />
+                  {myMap[toRender]}
+                </div>
+              </div>
+            ) : (
+              <Navigate to="/login" replace={true} />
+            )
+          }
+        />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<SignUp />} /> 
+      </Routes>
+    </Router>
   );
 };
 

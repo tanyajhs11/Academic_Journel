@@ -1,5 +1,5 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
+import { db, collection, addDoc } from '../firebaseConfig'; // Adjust the path accordingly
 
 function Bookchapter({ numberOfFields, setNumberOfFields }) {
   const currKey = "Bookchapter";
@@ -7,11 +7,10 @@ function Bookchapter({ numberOfFields, setNumberOfFields }) {
     "First Name*": "",
     "Title Of Book*": "",
     "Title Of Chapter*": "",
-    "Editor : First Name*":"",
-    "Publisher Address : City*":"",
-    "Publisher : First Name*" : "",
+    "Editor : First Name*": "",
+    "Publisher Address : City*": "",
+    "Publisher : First Name*": "",
   });
-
 
   const handleAddMoreClicked = (index) => {
     const newNumberOfFields = [...numberOfFields[currKey]];
@@ -21,7 +20,7 @@ function Bookchapter({ numberOfFields, setNumberOfFields }) {
 
   const handleRemoveClicked = (index) => {
     const newNumberOfFields = [...numberOfFields[currKey]];
-    newNumberOfFields[index] != 1
+    newNumberOfFields[index] !== 1
       ? (newNumberOfFields[index] -= 1)
       : (newNumberOfFields[index] = 1);
 
@@ -89,7 +88,7 @@ function Bookchapter({ numberOfFields, setNumberOfFields }) {
     return fields;
   };
 
-  const handleSubmitButtonClicked = () => {
+  const handleSubmitButtonClicked = async () => {
     let flag = false;
     for (const key in required) {
       if (required[key] === "") {
@@ -97,7 +96,30 @@ function Bookchapter({ numberOfFields, setNumberOfFields }) {
         break;
       }
     }
-    flag ? alert("Please fill all the required fields") : alert("Updated Successfully");
+
+    if (flag) {
+      alert("Please fill all the required fields");
+    } else {
+      try {
+        // Store data in Firestore
+        const docRef = await addDoc(collection(db, 'BookChapter'), {
+          // Replace 'your_collection_name' with your actual Firestore collection name
+          firstName: required["First Name*"],
+          titleOfBook: required["Title Of Book*"],
+          titleOfChapter: required["Title Of Chapter*"],
+          editorFirstName: required["Editor : First Name*"],
+          publisherCity: required["Publisher Address : City*"],
+          publisherFirstName: required["Publisher : First Name*"],
+        });
+
+        console.log("Document written with ID: ", docRef.id);
+        console.log("content----> ", required);
+        alert("Data updated successfully");
+      } catch (error) {
+        console.error("Error updating data: ", error);
+        alert("Error updating data");
+      }
+    }
   };
 
   
@@ -259,7 +281,12 @@ function Bookchapter({ numberOfFields, setNumberOfFields }) {
         >
           Submit
         </button>
-        <button class="button-43" role="button" style={{ marginRight: "32%" }}>
+        <button 
+        class="button-43" 
+        role="button" 
+        style={{ marginRight: "32%" }}
+        onClick={() => {}}
+        >
           Export
         </button>
       </div>

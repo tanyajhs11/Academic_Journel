@@ -1,15 +1,16 @@
-import React from 'react'
-import { useState } from "react";
+import React, { useState } from 'react';
+import { db, collection, addDoc } from '../firebaseConfig'; // Updated import
 
 function ExpertTalks({ numberOfFields, setNumberOfFields }) {
-  const currKey = "ExpertTalks";
+  const currKey = 'ExpertTalks';
   const [required, setRequired] = useState({
-    "Faculty's First Name*": "",
-    "Title of Talk*": "",
-    "Name of Programme*":"",
-    "Venue of Talk*":"",
-    "Date of Talk*":"",
+    "Faculty's First Name*": '',
+    'Title of Talk*': '',
+    'Name of Programme*': '',
+    'Venue of Talk*': '',
+    'Date of Talk*': '',
   });
+
   const handleFirstNameChanged = (e) => {
     setRequired({ ...required, "Faculty's First Name*": e.target.value });
   };
@@ -78,16 +79,37 @@ function ExpertTalks({ numberOfFields, setNumberOfFields }) {
   };
 
 
-  const handleSubmitButtonClicked = () => {
+  const handleSubmitButtonClicked = async () => {
     let flag = false;
     for (const key in required) {
-      if (required[key] === "") {
+      if (required[key] === '') {
         flag = true;
         break;
       }
     }
-    flag ? alert("Please fill all the required fields") : alert("Updated Successfully");
+
+    if (flag) {
+      alert('Please fill all the required fields');
+    } else {
+      try {
+        // Add the data to Firestore
+        const docRef = await addDoc(collection(db, 'ExpertTalks'), {
+          'Faculty\'s First Name': required["Faculty's First Name*"],
+          'Title of Talk': required['Title of Talk*'],
+          'Name of Programme': required['Name of Programme*'],
+          'Venue of Talk': required['Venue of Talk*'],
+          'Date of Talk': required['Date of Talk*'],
+        });
+
+        console.log('Document written with ID: ', docRef.id);
+        alert('Updated Successfully');
+      } catch (error) {
+        console.error('Error adding document: ', error);
+        alert('Error updating. Please try again.');
+      }
+    }
   };
+
   return (
     <div className='containerbox1'>
       <div className='title'> Please Enter The Following Details :- </div>

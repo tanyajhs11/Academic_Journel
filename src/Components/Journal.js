@@ -1,5 +1,7 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState , useEffect} from "react";
+import { db, collection, addDoc , getDocs } from '../firebaseConfig'; // Adjust the path accordingly
+import generatePDF from 'react-to-pdf';
+
 
 function Journal({ numberOfFields, setNumberOfFields }) {
   const currKey = "Journal";
@@ -7,8 +9,35 @@ function Journal({ numberOfFields, setNumberOfFields }) {
     "First Name": "",
     "Name Of Journal": "",
     "Title Of Paper": "",
-    Publisher : "",
+    Publisher: "",
   });
+  const [journalData, setJournalData] = useState([]);
+  const targetRef = React.useRef();
+
+  const fetchDataFromFirestore = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, 'Journal'));
+      const data = [];
+      querySnapshot.forEach((doc) => {
+        data.push(doc.data());
+      });
+      console.log('Fetched data from Firestore:', data);
+      setJournalData(data);
+    } catch (error) {
+      console.error('Error fetching data from Firestore:', error);
+    }
+  };
+
+
+const handleExportButtonClicked = async () => {
+  await fetchDataFromFirestore();
+
+  const options = {
+    filename: 'journal_data.pdf',
+  };
+
+  generatePDF(targetRef, {filename: 'page.pdf'});
+};
 
   const handleAddMoreClicked = (index) => {
     const newNumberOfFields = [...numberOfFields[currKey]];
@@ -18,7 +47,7 @@ function Journal({ numberOfFields, setNumberOfFields }) {
 
   const handleRemoveClicked = (index) => {
     const newNumberOfFields = [...numberOfFields[currKey]];
-    newNumberOfFields[index] != 1
+    newNumberOfFields[index] !== 1
       ? (newNumberOfFields[index] -= 1)
       : (newNumberOfFields[index] = 1);
 
@@ -36,6 +65,7 @@ function Journal({ numberOfFields, setNumberOfFields }) {
   const handleJournalNameChanged = (e) => {
     setRequired({ ...required, "Name Of Journal": e.target.value });
   };
+
   const handlePaperTitleChanged = (e) => {
     setRequired({ ...required, "Title Of Paper": e.target.value });
   };
@@ -44,15 +74,15 @@ function Journal({ numberOfFields, setNumberOfFields }) {
     const fields = [];
     for (let i = 0; i < numberOfFields[currKey][index]; i++) {
       fields.push(
-        <div className="nametitle">
+        <div className="nametitle" key={i}>
           <div className="inputfield">
             <div className="inputfieldtext">
-              <label for="fname">First Name*</label>
+              <label htmlFor="fname">First Name*</label>
             </div>
             <input
               type="text"
-              id="fname"
-              name="firstname"
+              id={`fname-${i}`}
+              name={`firstname-${i}`}
               placeholder="Your first name"
               onChange={(e) => handleFirstNameChange(e)}
             />
@@ -60,17 +90,16 @@ function Journal({ numberOfFields, setNumberOfFields }) {
 
           <div className="inputfield">
             <div className="inputfieldtext">
-              <label for="fname">Middle Name</label>
+              <label htmlFor="mname">Middle Name</label>
             </div>
-            <input type="text" id="fname" name="lastname" placeholder="Your Middle name" />
+            <input type="text" id={`mname-${i}`} name={`middlename-${i}`} placeholder="Your Middle name" />
           </div>
 
-        
           <div className="inputfield">
             <div className="inputfieldtext">
-              <label for="fname">Last Name</label>
+              <label htmlFor="lname">Last Name</label>
             </div>
-            <input type="text" id="fname" name="lastname" placeholder="Your last name" />
+            <input type="text" id={`lname-${i}`} name={`lastname-${i}`} placeholder="Your last name" />
           </div>
         </div>
       );
@@ -78,7 +107,7 @@ function Journal({ numberOfFields, setNumberOfFields }) {
     return fields;
   };
 
-  const handleSubmitButtonClicked = () => {
+  const handleSubmitButtonClicked = async () => {
     let flag = false;
     for (const key in required) {
       if (required[key] === "") {
@@ -86,13 +115,31 @@ function Journal({ numberOfFields, setNumberOfFields }) {
         break;
       }
     }
-    flag ? alert("Please fill all the required fields") : alert("Updated Successfully");
+    if (flag) {
+      alert("Please fill all the required fields");
+    } else {
+      try {
+        // Store data in Firestore
+        const docRef = await addDoc(collection(db, 'Journal'), {
+          firstName: required["First Name"],
+          nameOfJournal: required["Name Of Journal"],
+          titleOfPaper: required["Title Of Paper"],
+          publisher: required["Publisher"],
+        });
+
+        console.log("Document written with ID: ", docRef.id);
+        alert("Data updated successfully");
+      } catch (error) {
+        console.error("Error updating data: ", error);
+        alert("Error updating data");
+      }
+    }
   };
 
   const addOptions = (start, end) => {
     const options = [];
     for (let i = start; i <= end; i++) {
-      options.push(<option value={i}>{i}</option>);
+      options.push(<option key={i} value={i}>{i}</option>);
     }
     return options;
   };
@@ -101,32 +148,53 @@ function Journal({ numberOfFields, setNumberOfFields }) {
     <div className="containerbox1">
       <div className="title">Please Enter The Following Details :-</div>
 
-      <div>
-        
-      </div>
-     
-      <div>
-        <button
-          style={{position:"relative",left:"1120px",top:"22px"}} onClick={() => handleAddMoreClicked(0)}>Add More</button>
+      <div ref={targetRef} style={{display:"none"}} id="pdf-content"> {/* This is the target element for PDF content */}
+        {/* Your data rendering logic here */}
+        {journalData.map((entry, index) => (
+          <div key={index}>
+            <p>{`First Name: ${entry["First Name"]}`}</p>
+            <p>{`Name Of Journal: ${entry["Name Of Journal"]}`}</p>
+            <p>{`Title Of Paper: ${entry["Title Of Paper"]}`}</p>
+            <p>{`Publisher: ${entry["Publisher"]}`}</p>
+          </div>
+        ))}
       </div>
 
       <div>
-        <button 
-          style={{ marginLeft: "85%",position:"relative",left:"100px"}}onClick={() => handleRemoveClicked(0)}>Remove</button>
+        <button style={{ position: "relative", left: "1120px", top: "22px" }} onClick={() => handleAddMoreClicked(0)}>Add More</button>
       </div>
-      {renderFields(0)}
 
-     
+      <div>
+        <button style={{ marginLeft: "85%", position: "relative", left: "100px" }} onClick={() => handleRemoveClicked(0)}>Remove</button>
+      </div>
+      {journalData.map((entry, index) => (
+        <div style={{ display: 'none' }}  key={index} >
+          <p>{`First Name: ${entry["firstName"]}`}</p>
+          <p>{`Name Of Journal: ${entry["nameOfJournal"]}`}</p>
+          <p>{`Title Of Paper: ${entry["titleOfPaper"]}`}</p>
+          <p>{`Publisher: ${entry["publisher"]}`}</p>
+        </div>
+      ))}
+      <div id="pdf-content" style={{ display: 'none' }}>
+        {journalData.map((entry, index) => (
+          <div key={index}>
+            <p>{`First Name: ${entry["firstName"]}`}</p>
+            <p>{`Name Of Journal: ${entry["nameOfJournal"]}`}</p>
+            <p>{`Title Of Paper: ${entry["titleOfPaper"]}`}</p>
+            <p>{`Publisher: ${entry["publisher"]}`}</p>
+          </div>
+        ))}
+      </div>
 
       <div className="nametitle">
         <div className="inputfield">
           <div className="inputfieldtext">
-            <label for="fname">Title Of Paper*</label>
+            <label htmlFor="titleOfPaper">Title Of Paper*</label>
           </div>
           <input
             type="text"
-            id="fname"
-            name="lastname"
+            id="titleOfPaper"
+            name="titleOfPaper"
             placeholder="Paper Title"
             onChange={(e) => handlePaperTitleChanged(e)}
           />
@@ -134,12 +202,12 @@ function Journal({ numberOfFields, setNumberOfFields }) {
 
         <div className="inputfield">
           <div className="inputfieldtext">
-            <label for="fname">Name of Journal*</label>
+            <label htmlFor="journalName">Name of Journal*</label>
           </div>
           <input
             type="text"
-            id="fname"
-            name="lastname"
+            id="journalName"
+            name="journalName"
             placeholder="Journal Name"
             onChange={(e) => handleJournalNameChanged(e)}
           />
@@ -147,45 +215,40 @@ function Journal({ numberOfFields, setNumberOfFields }) {
 
         <div className="inputfield">
           <div className="inputfieldtext">
-            <label for="fname">DOI</label>
+            <label htmlFor="doi">DOI</label>
           </div>
-          <input type="text" id="fname" name="lastname" placeholder="Doi" />
+          <input type="text" id="doi" name="doi" placeholder="Doi" />
         </div>
       </div>
 
-    
-
-  
-
       <div className="nametitle">
-          <div className="inputfield">
-            <div className="inputfieldtext">
-              <label for="fname">Publisher : First Name*</label>
-            </div>
-            <input
-              type="text"
-              id="fname"
-              name="firstname"
-              placeholder="Your first name"
-              onChange={(e) => handlePublisherChanged(e)}
-            />
+        <div className="inputfield">
+          <div className="inputfieldtext">
+            <label htmlFor="pubFirstName">Publisher : First Name*</label>
           </div>
-
-          <div className="inputfield">
-            <div className="inputfieldtext">
-              <label for="fname">Publisher : Middle Name</label>
-            </div>
-            <input type="text" id="fname" name="lastname" placeholder="Your Middle name" />
-          </div>
-
-        
-          <div className="inputfield">
-            <div className="inputfieldtext">
-              <label for="fname">Publisher : Last Name</label>
-            </div>
-            <input type="text" id="fname" name="lastname" placeholder="Your last name" />
-          </div>
+          <input
+            type="text"
+            id="pubFirstName"
+            name="pubFirstName"
+            placeholder="Your first name"
+            onChange={(e) => handlePublisherChanged(e)}
+          />
         </div>
+
+        <div className="inputfield">
+          <div className="inputfieldtext">
+            <label htmlFor="pubMiddleName">Publisher : Middle Name</label>
+          </div>
+          <input type="text" id="pubMiddleName" name="pubMiddleName" placeholder="Your Middle name" />
+        </div>
+
+        <div className="inputfield">
+          <div className="inputfieldtext">
+            <label htmlFor="pubLastName">Publisher : Last Name</label>
+          </div>
+          <input type="text" id="pubLastName" name="pubLastName" placeholder="Your last name" />
+        </div>
+      </div>
 
       <p
         style={{
@@ -203,22 +266,22 @@ function Journal({ numberOfFields, setNumberOfFields }) {
       <div className="nametitle">
         <div className="inputfield">
           <div className="inputfieldtext">
-            <label for="fname">Page From</label>
+            <label htmlFor="pageFrom">Page From</label>
           </div>
-          <input type="number" id="page" name="lastname" placeholder="From" />
+          <input type="number" id="pageFrom" name="pageFrom" placeholder="From" />
         </div>
 
         <div className="inputfield">
           <div className="inputfieldtext">
-            <label for="fname">Page To</label>
+            <label htmlFor="pageTo">Page To</label>
           </div>
-          <input type="number" id="page" name="lastname" placeholder="To" />
+          <input type="number" id="pageTo" name="pageTo" placeholder="To" />
         </div>
         <div className="inputfield" style={{ marginLeft: "7%", width: 90 }}>
           <div className="inputfieldtext" style={{ marginLeft: "-95%", marginBottom: "12%" }}>
-            <label for="fname">Year</label>
+            <label htmlFor="year">Year</label>
           </div>
-          <select class="form-select" id="year" name="year" style={{ marginLeft: "-100%" }}>
+          <select className="form-select" id="year" name="year" style={{ marginLeft: "-100%" }}>
             <option value="">year</option>
             {addOptions(1940, 2023)}
           </select>
@@ -226,40 +289,37 @@ function Journal({ numberOfFields, setNumberOfFields }) {
       </div>
 
       <div className="nametitle">
-
-      <div className="inputfield">
+        <div className="inputfield">
           <div className="inputfieldtext">
-            <label for="fname">Number Of Authors</label>
+            <label htmlFor="numAuthors">Number Of Authors</label>
           </div>
-          <input type="number" id="page" name="lastname" placeholder="Number" />
+          <input type="number" id="numAuthors" name="numAuthors" placeholder="Number" />
         </div>
 
         <div className="inputfield">
           <div className="inputfieldtext">
-            <label for="fname">Volume : </label>
+            <label htmlFor="volume">Volume : </label>
           </div>
-          <input type="text" id="fname" name="lastname" placeholder="Volume no." />
+          <input type="text" id="volume" name="volume" placeholder="Volume no." />
         </div>
         <div className="inputfield">
           <div className="inputfieldtext">
-            <label for="fname">Volume Number : </label>
+            <label htmlFor="volumeNumber">Volume Number : </label>
           </div>
-          <input type="number" id="fname" name="lastname" placeholder="Number." />
+          <input type="number" id="volumeNumber" name="volumeNumber" placeholder="Number." />
         </div>
-
-
       </div>
 
       <div className="buttoncontainer">
         <button
-          class="button-43"
+          className="button-43"
           role="button"
           style={{ marginLeft: "41.5%" }}
           onClick={handleSubmitButtonClicked}
         >
           Submit
         </button>
-        <button class="button-43" role="button" style={{ marginRight: "32%" }}>
+        <button className="button-43" role="button" style={{ marginRight: "32%" }}  onClick={handleExportButtonClicked}>
           Export
         </button>
       </div>

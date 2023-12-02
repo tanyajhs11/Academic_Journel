@@ -1,54 +1,58 @@
-import React from "react";
-import HomeIcon from "@mui/icons-material/Home";
+import React from 'react';
+import HomeIcon from '@mui/icons-material/Home';
 import ImportContactsIcon from '@mui/icons-material/ImportContacts';
-import BookIcon from "@mui/icons-material/Book";
-import VideoCallIcon from "@mui/icons-material/VideoCall";
-import PeopleIcon from "@mui/icons-material/People";
-import DirectionsRunIcon from "@mui/icons-material/DirectionsRun";
-import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
-import AndroidIcon from "@mui/icons-material/Android";
-import FeedIcon from "@mui/icons-material/Feed";
-
+import BookIcon from '@mui/icons-material/Book';
+import VideoCallIcon from '@mui/icons-material/VideoCall';
+import PeopleIcon from '@mui/icons-material/People';
+import DirectionsRunIcon from '@mui/icons-material/DirectionsRun';
+import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
+import AndroidIcon from '@mui/icons-material/Android';
+import FeedIcon from '@mui/icons-material/Feed';
 
 export const SidebarData = [
   {
-    title: "Home",
+    title: 'Home',
     icon: <HomeIcon />,
-    link: "/Home",
+    link: '/Home',
   },
   {
-    title: "Journal",
+    title: 'Journal',
     icon: <ImportContactsIcon />,
-    link: "/Journal",
+    link: '/Journal',
   },
   {
-    title: "Bookchapter",
+    title: 'Bookchapter',
     icon: <BookIcon />,
-    link: "/Book",
+    link: '/Book',
   },
   {
-    title: "Conference",
+    title: 'Conference',
     icon: <VideoCallIcon />,
-    link: "/Conference",
+    link: '/Conference',
   },
   {
-    title: "ExpertTalks",
+    title: 'ExpertTalks',
     icon: <PeopleIcon />,
-    link: "/People",
+    link: '/People',
   },
   {
-    title: "InvitedTalks",
+    title: 'InvitedTalks',
     icon: <DirectionsRunIcon />,
-    link: "/DirectionsRun",
+    link: '/DirectionsRun',
   },
   {
-    title: "WorkshopSeminar",
+    title: 'WorkshopSeminar',
     icon: <WorkspacePremiumIcon />,
-    link: "/WorkspacePremium",
+    link: '/WorkspacePremium',
   },
   {
-    title: "PaperReviews",
+    title: 'PaperReviews',
     icon: <FeedIcon />,
-    link: "/Android",
+    link: '/Android',
+  },
+  {
+    title: 'Sign Out',
+    icon: <i className="fas fa-sign-out-alt" />,
+    link: '/',
   },
 ];
